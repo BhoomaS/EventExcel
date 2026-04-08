@@ -1,0 +1,195 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f6f6f6; 
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+         /* background-image: url('https://portal-test.visionhawk.com/assets/img/Polygons-1024x683.jpeg'); 
+         background-repeat:no-repeat;
+         background-size:cover; */
+    }
+    a.navbar-brand {
+        color: #000 !important;
+        font-size: 25px;
+    }
+
+    .logout-btn, download-btn {
+        display: none !important;
+    }
+    .download-btn{
+        display:none !important;
+    }
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+    }
+    form {
+        background-color: #ffffff; 
+        padding: 30px;
+        width: 100%;
+        margin: 0 10px;
+        border-radius: 6px;
+        border: 1px solid #999;
+        box-shadow: 0 0 15px rgba(0, 0, 0, .5);
+    }
+
+    input[type="file"], select, .memberId {
+        width: 100%;
+        padding: 10px;
+        margin: 0 0 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    input:focus, input:hover, input:focus-within {
+        border-color: #3498db;
+        outline-color: #3498db;
+    }
+    button {
+        background-color: #3498db;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+        outline: none !important;
+    }
+    button:hover {
+        background-color: #2980b9; 
+    }
+
+    .form-label{
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        width: 100%;
+    }
+    .member-summary-form{
+        text-align:left;
+    }
+
+    .form-section{
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .form-container {
+        width: 50%;
+        display: inline-flex;
+    }
+    .form-title{
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+
+    }
+    .form-login-container {
+        width: 50%;
+        display: inline-flex;
+        margin: 0 auto;
+    }
+</style>
+<div class="text-center form-section">
+    <div class="form-login-container">
+        <form class="member-summary-form">
+            <div class="form-group">
+                <label class="form-label">User Name:</label>
+                <input class="memberId" type="text" id="userName" name="member-id" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password:</label>
+                <input class="memberId" type="password" id="password" name="member-id" />
+            </div>
+            <button type="button" id="login-btn">Login</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    //$('#logoutBtn').hide();
+    // Password validation function
+    function validatePassword(password) {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return regex.test(password);
+    }
+
+    // Show error message below field
+    function showError(inputId, message) {
+        $('#' + inputId).next('.error-msg').remove(); // remove existing error if any
+        const error = $('<div class="error-msg" style="color: red; font-size: 14px;"></div>').text(message);
+        $('#' + inputId).after(error);
+    }
+
+    // On login button click
+    $('#login-btn').on('click', function (e) {
+        var userName = $('#userName').val();
+        var password = $('#password').val();
+
+        $('.error-msg').remove(); // clear previous errors
+        let isValid = true;
+
+        if (!userName) {
+            showError("userName", "Username is required");
+            isValid = false;
+        }
+
+        if (!password) {
+            showError("password", "Password is required");
+            isValid = false;
+        } else if (!validatePassword(password)) {
+            showError("password", "Password must be at least 8 characters, include uppercase, lowercase, number, and special character");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            return; // Don't continue to submit AJAX if form is invalid
+        }
+
+       // alert("Login Ajax Called successfully");
+
+        var formData = new FormData();
+        formData.append('userName', userName);
+        formData.append('password', password);
+
+        $.ajax({
+            url: '/Account/Login',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                //alert("Login Successfully.");
+                window.location.href = '/Account/MFA';
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                alert("Invalid login credentials.");
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+

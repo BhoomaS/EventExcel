@@ -1,0 +1,439 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f6f6f6; 
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+
+    a.navbar-brand {
+        color: #000 !important;
+        font-size: 25px;
+    }
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+    }
+    form {
+        background-color: #ffffff; 
+        padding: 30px;
+        width: 100%;
+        margin: 0 10px;
+        border-radius: 6px;
+        border: 1px solid #999;
+        box-shadow: 0 0 15px rgba(0, 0, 0, .5);
+    }
+
+    input[type="file"], select, .memberId {
+        width: 100%;
+        padding: 10px;
+        margin: 0 0 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    input:focus, input:hover, input:focus-within,
+        select:focus, select:hover, select:focus-within {
+        border-color: #3498db;
+        outline-color: #3498db;
+    }
+    button {
+        background-color: #3498db;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+        outline: none !important;
+    }
+    button:hover {
+        background-color: #2980b9; 
+    }
+
+    .form-label{
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        width: 100%;
+    }
+    .member-summary-form{
+        text-align:left;
+    }
+
+    .form-section{
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .form-container {
+        width: 50%;
+        display: inline-flex;
+    }
+    .form-title{
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+
+    }
+
+    .loader-fixed {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 99999;
+        pointer-events: auto !important;
+        background-color: rgba(0, 0, 0, 0.6);
+        width: 100%;
+        height: 100%;
+        user-select: none !important;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+</style>
+<div id="loader" class="loader-fixed" style="display:none; text-align:center; margin-top:20px;">
+    <img src="~/images/spinner.gif" alt="Loading..." width="70" height="70" />
+</div>
+
+<div class="text-center form-section">
+    <div class="form-container">
+        <form class="member-summary-form">
+            <h5 class="form-title">Option 1</h5>
+            <div class="form-group">
+                <label for="client-dropdown" class="form-label">Select a Client:</label>
+                <select id="client-dropdown" name="CLIENTNAME">
+                    <option value="" disabled selected>Select a client</option>
+                    <option value="Aligned Marketplace">Aligned Marketplace</option>
+                    <option value="Balls Food Stores">Balls Food Stores</option>
+                    <option value="Chalk Mountain">Chalk Mountain</option>
+                    <option value="Coupe Health">Coupe Health</option>
+                    <option value="DART">DART</option>
+                    <option value="DuraServ">DuraServ</option>
+                    <option value="Hydro-Gear">Hydro-Gear</option>
+                    <option value="Patriot Rail">Patriot Rail</option>
+                    <option value="Revantage">Revantage</option>
+                    <option value="Seven Eleven">Seven Eleven</option>
+                    <option value="Trinity">Trinity</option>
+                    <option value="USI">USI</option>
+                    <option value="Varsity Brands">Varsity Brands</option>
+                    <option value="Western Alliance Bank">Western Alliance Bank</option>
+                </select>
+            </div>
+            <div class="form-group">
+            <label class="form-label">Enter MemberId:</label>
+            <input class="memberId" type="number" id="memberId" name="member-id" />
+            </div>
+            <button type="button" id="submit-btn">Generate file</button>
+        </form>
+    </div>
+
+    <div class="form-container">
+        <form class="member-summary-form">
+            <h5 class="form-title">Option 2</h5>
+            <div class="form-group">
+                <label for="client-file-dropdowns" class="form-label">Select a Client:</label>
+                <select id="client-file-dropdowns" name="CLIENTNAME">
+                    <option value="" disabled selected>Select a client</option>
+                    <option value="Aligned Marketplace">Aligned Marketplace</option>
+                    <option value="Balls Food Stores">Balls Food Stores</option>
+                    <option value="Chalk Mountain">Chalk Mountain</option>
+                    <option value="Coupe Health">Coupe Health</option>
+                    <option value="DART">DART</option>
+                    <option value="DuraServ">DuraServ</option>
+                    <option value="Hydro-Gear">Hydro-Gear</option>
+                    <option value="Patriot Rail">Patriot Rail</option>
+                    <option value="Revantage">Revantage</option>
+                    <option value="Seven Eleven">Seven Eleven</option>
+                    <option value="Trinity">Trinity</option>
+                    <option value="USI">USI</option>
+                    <option value="Varsity Brands">Varsity Brands</option>
+                    <option value="Western Alliance Bank">Western Alliance Bank</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Select MemberId File:</label>
+                <input type="file" id="excelFile" name="file" accept=".xlsx,.xls">
+            </div>
+            <button type="button" id="submit-file-btn">Generate file</button>
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+       
+    $('#submit-btn').on('click', function (e) {
+        e.preventDefault();
+
+        const clientName = $('#client-dropdown').val();
+        const memberId = $('#memberId').val();
+
+        if (!clientName) {
+            alert('Please select a client.');
+            showError("clientName", "ClientName is required");
+            return;
+        }
+
+        if (!memberId) {
+            alert('Please enter a Member ID.');
+            showError("memberId", "MemberId is required");
+            return;
+        }
+
+        const clientMap = {
+            "Aligned Marketplace": "ch119",
+            "Balls Food Stores": "ch110",
+            "Chalk Mountain": "ch112",
+            "Coupe Health": "ch102",
+            "DART": "ch104",
+            "DuraServ": "ch105",
+            "Hydro-Gear": "ch106",
+            "Patriot Rail": "ch115",
+            "Revantage": "ch122",
+            "Seven Eleven": "ch116",
+            "Trinity": "ch121",
+            "USI": "ch124",
+            "Varsity Brands": "ch109",
+            "Western Alliance Bank": "ch123"
+        };
+
+        const clientId = clientMap[clientName] || '';
+        if (!clientId) {
+            alert('Invalid client selected.');
+            return;
+        }
+
+        const request = {
+            ClientName: clientName,
+            ClientId: clientId,
+            MemberId: memberId
+        };
+        console.log("clientName:", clientName);
+        console.log("clientId:", clientId);
+        console.log("memberId:", memberId);
+        console.log("Sending request:", JSON.stringify(request));
+        $('#loader').show();
+
+        $.ajax({
+            // url: 'https://phssummary.visionhawk.com/Home/GenerateSummaryReport',
+            url: '/Home/GenerateSummaryReport',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(request),
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function (data, status, xhr) {
+                const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = `${memberId}_MemberSummary.xlsx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(downloadUrl);
+                alert("File generated successfully.");
+            },
+            error: function (xhr, status, error) {
+                let errorMsg = "Error generating file.";
+                if (xhr.responseText) {
+                    errorMsg += "\nDetails: " + xhr.responseText;
+                }
+                alert(errorMsg);
+                console.error("XHR:", xhr);
+                console.error("Status:", status);
+                console.error("Error:", error);
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        });
+    });
+
+
+
+    // File upload and bulk download
+    $('#submit-file-btn').on('click', function (e) {
+        e.preventDefault();
+
+        var clientNames = $('#client-file-dropdowns').val();
+        var fileInputElement = $('#excelFile')[0];
+        var clientIds = '';
+
+        const clientMaps = {
+            "Aligned Marketplace": "ch119",
+            "Balls Food Stores": "ch110",
+            "Chalk Mountain": "ch112",
+            "Coupe Health": "ch102",
+            "DART": "ch104",
+            "DuraServ": "ch105",
+            "Hydro-Gear": "ch106",
+            "Patriot Rail": "ch115",
+            "Revantage": "ch122",
+            "Seven Eleven": "ch116",
+            "Trinity": "ch121",
+            "USI": "ch124",
+            "Varsity Brands": "ch109",
+            "Western Alliance Bank": "ch123"
+        };
+
+        clientIds = clientMaps[clientNames] || '';
+
+        if (!fileInputElement) {
+            alert("File input element not found!");
+            showError("fileInputElement", "File input element not found!");
+            return;
+        }
+
+        var fileInput = fileInputElement.files[0];
+
+        if (!clientNames || !fileInput) {
+            alert('Please select a client and a file.');
+            showError("clientNames", "Please select a client and a file.");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('clientName', clientNames);
+        formData.append('file', fileInput);
+        formData.append('clientId', clientIds);
+        $('#loader').show();
+
+        $.ajax({
+            url: 'https://phssummary.visionhawk.com/Home/GenerateSummaryFileReport',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.memberIds && response.memberIds.length > 0) {
+                    let completedDownloads = 0;
+                    const totalDownloads = response.memberIds.length;
+                    response.memberIds.forEach((memberId, index) => {
+                        setTimeout(() => {
+                            const request = {
+                                ClientName: response.clientName,
+                                ClientId: response.clientId,
+                                MemberId: memberId
+                            };
+                            $.ajax({
+                                url: 'https://phssummary.visionhawk.com/Home/GenerateSummaryReport',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify(request),
+                                xhrFields: {
+                                    responseType: 'blob'
+                                },
+                                success: function (data, status, xhr) {
+                                    const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') });
+                                    const downloadUrl = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = downloadUrl;
+                                    link.download = `${memberId}_MemberSummary.xlsx`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Error downloading file:", error);
+                                },
+                                complete: function () {
+                                    $('#loader').hide();
+                                    completedDownloads++;
+                                    if (completedDownloads === totalDownloads) {
+                                        alert("File Generated successfully.");
+                                    }
+                                }
+                            });
+                        }, index * 1000);
+                    });
+                } else {
+                    alert("No member IDs found in Excel file.");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("XHR:", xhr);
+                console.error("Status:", status);
+                console.error("Error:", error);
+                alert("Error uploading or processing file.");
+                $('#loader').hide();
+            }
+        });
+    });
+
+
+      $('#logoutBtn').click(function () {
+           
+            $.ajax({
+                url: '/Account/Logout',
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                //alert("Logout Successfully.");
+                $('#logoutBtn').hide();
+                    window.location.href = '/Account/Index';
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+
+    // $('#downloadBtn').click(function () {
+    //     alert("download started");
+    //     const link = document.createElement("a");
+    //     link.href = "/excel/PHSsummary-Sample-File.xlsx";
+    //     link.download = "PHSsummary-Sample-File.xlsx";
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+    // });
+    $('#downloadBtn').click(function () {
+        // Show spinner
+        $('#downloadSpinner').removeClass('d-none');
+        $('#downloadBtnContent').addClass('d-none');
+
+        // Simulate short processing time
+        setTimeout(function () {
+            const link = document.createElement("a");
+            link.href = "/excel/PHSsummary-Sample-File.xlsx";
+            link.download = "PHSsummary-Sample-File.xlsx";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Hide spinner and restore button text
+            $('#downloadSpinner').addClass('d-none');
+            $('#downloadBtnContent').removeClass('d-none');
+        }, 1000); // You can adjust this delay or use a callback if downloading via fetch
+    });
+
+
+
+
+</script>
+
+
+
+
+
+
+

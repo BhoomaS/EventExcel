@@ -1,0 +1,188 @@
+﻿@{
+    ViewData["Title"] = "MFA Page";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f6f6f6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+
+    a.navbar-brand {
+        color: #000 !important;
+        font-size: 25px;
+    }
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+    }
+    form {
+        background-color: #ffffff;
+        padding: 30px;
+        width: 100%;
+        margin: 0 10px;
+        border-radius: 6px;
+        border: 1px solid #999;
+        box-shadow: 0 0 15px rgba(0, 0, 0, .5);
+    }
+
+    input[type="file"], select, .memberId {
+        width: 100%;
+        padding: 10px;
+        margin: 0 0 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    input:focus, input:hover, input:focus-within {
+        border-color: #3498db;
+        outline-color: #3498db;
+    }
+
+    .logout-btn, download-btn {
+        display: none !important;
+    }
+
+    .download-btn {
+        display: none !important;
+    }
+    button {
+        background-color: #3498db;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+        outline:none !important;
+    }
+    button:hover {
+        background-color: #2980b9;
+    }
+
+    .form-label{
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        width: 100%;
+    }
+    .member-summary-form{
+        text-align:left;
+    }
+
+    .form-section{
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .form-container {
+        width: 50%;
+        display: inline-flex;
+    }
+    .form-title{
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+
+    }
+    .form-login-container {
+        width: 50%;
+        display: inline-flex;
+        margin: 0 auto;
+    }
+    .authetication-code {
+        font-size: 14px;
+        color: #828282;
+    }
+
+    .title-text{
+        text-align:center;
+        margin-bottom:15px;
+    }
+
+  /*    .verification-code-row{
+         width:200px;
+         margin:0 auto;
+     } */
+
+</style>
+<div class="text-center form-section">
+    <div class="form-login-container">
+        <form class="member-summary-form">
+            <h4 class="title-text">Two-Factor Authentication</h4>
+            <div class="form-group">
+                <p class="authetication-code">Enter the 6-digit authentication code from your Google Authenticator app.</p>
+            </div>
+            @* <div class="verification-code-row"> *@
+            <div class="form-group">
+                <label for="otp" class="form-label">Authentication Code</label>
+                <input class="memberId" type="text" inputmode="numeric" pattern="\d{6}" maxlength="6" id="otp" name="otp" placeholder="Enter code" required />
+            </div>
+            <button type="submit" id="verify-btn">Verify</button>
+        @*     </div> *@
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+      //  $('#logoutBtn').hide();
+        $('#verify-btn').on('click', function (e) {
+            e.preventDefault(); // Prevent regular form submission
+
+            const otpCode = $("#otp").val().trim();
+           // alert(otpCode + "otpCode");
+            // Basic front-end validation
+            if (!/^\d{6}$/.test(otpCode)) {
+                alert("Please enter a valid 6-digit code.");
+                return;
+            }
+            const mfaModel = {
+                CodeDigit: $("#otp").val().trim()
+            };
+
+            $.ajax({
+                url: '/Account/TwoFactorAuthenticate',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(mfaModel),
+                success: function (response) {
+                    if (response.success) {
+                       // alert("Authentication successful!");
+                        window.location.href = "/Home/Index"; // Redirect to home or wherever
+                    } else {
+                        alert(response.message || "Incorrect Authentication code.");
+                    }
+                },
+                error: function (xhr) {
+                    const err = xhr.responseJSON?.message || "Incorrect Authentication code. Please try again.";
+                    alert(err);
+                }
+            });
+
+
+
+
+        });
+    });
+</script>
+
+
+
+
+
+
